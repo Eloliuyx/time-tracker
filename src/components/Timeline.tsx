@@ -99,19 +99,20 @@ function TimelineItem({
       <div className="mt-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <select
-            value={record.category ?? "Work"}
-            onChange={(e) =>
-              onUpdateCategory(record.id, e.target.value as Category)
-            }
-            onClick={(e) => e.stopPropagation()}
-            className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-1 text-xs text-zinc-700 dark:text-zinc-200"
-          >
-           {CATEGORIES.map((item) => (
-  <option key={item} value={item}>
-    {CATEGORY_LABELS[item]}
+  value={record.category ?? ""}
+  onChange={(e) => onUpdateCategory(record.id, e.target.value as Category)}
+  onClick={(e) => e.stopPropagation()}
+  className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-1 text-xs text-zinc-700 dark:text-zinc-200"
+>
+  <option value="" disabled>
+    未分类
   </option>
-))}
-          </select>
+  {CATEGORIES.map((item) => (
+    <option key={item} value={item}>
+      {CATEGORY_LABELS[item]}
+    </option>
+  ))}
+</select>
 
           <p className="text-xs text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
             {formatTime(record.startTime)} – {formatTime(record.endTime)}
