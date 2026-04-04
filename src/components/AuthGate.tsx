@@ -11,6 +11,8 @@ export default function AuthGate({
   const [loading, setLoading] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -41,19 +43,17 @@ export default function AuthGate({
   }, []);
 
   async function handleSignIn() {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+    setErrorMessage("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
 
     if (error) {
-      alert(error.message);
+      setErrorMessage(error.message);
       return;
     }
-
-    alert("Check your email for the login link.");
   }
 
   async function handleSignOut() {
@@ -67,20 +67,34 @@ export default function AuthGate({
   if (!signedIn) {
     return (
       <div className="p-6 space-y-4">
-        <h1 className="text-xl font-semibold">Sign in</h1>
+        <h1 className="text-xl font-semibold">登录</h1>
+
         <input
           className="border rounded px-3 py-2 w-full max-w-sm"
           type="email"
-          placeholder="you@example.com"
+          placeholder="邮箱"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
+        <input
+          className="border rounded px-3 py-2 w-full max-w-sm"
+          type="password"
+          placeholder="密码"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
         <button
           className="border rounded px-4 py-2"
           onClick={handleSignIn}
         >
-          Send magic link
+          登录
         </button>
+
+        {errorMessage && (
+          <div className="text-sm text-red-500">{errorMessage}</div>
+        )}
       </div>
     );
   }
@@ -89,7 +103,7 @@ export default function AuthGate({
     <>
       <div className="p-4">
         <button className="border rounded px-3 py-1" onClick={handleSignOut}>
-          Sign out
+          退出登录
         </button>
       </div>
       {children}
