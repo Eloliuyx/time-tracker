@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 时间沙漏
 
-## Getting Started
+一个极简的个人时间追踪 Web App。
 
-First, run the development server:
+你只需要输入“刚刚在做什么”，系统就会把这段时间记录下来，并自动用 AI 归类。你还可以在回顾页按日期查看当天记录、分类汇总和时间分布图。
 
-```bash
+## Features
+
+### Tracking
+- Continuous session timer
+- Quick text-based time logging
+- Automatic start/end time capture
+- AI-powered category classification (you need to add your own API key)
+- Inline editing for record labels
+- Inline category editing on record cards
+- Undo latest record
+
+### Review
+- Separate 记录 / 回顾 tabs
+- Daily review by date
+- Total tracked time for the selected day
+- Category summary
+- Donut chart for time distribution
+- Chinese category labels in the UI
+
+### Storage and Auth
+- Supabase-backed persistence
+- Login required
+- Cross-device access to the same data
+
+## Categories
+
+The app classifies each record into one of the following categories:
+
+- 工作
+- 学习
+- 事务
+- 生活
+- 自我照料
+- 运动
+- 娱乐
+- 休息
+
+AI assigns a category automatically when a record is created. Categories can be edited manually later.
+
+## Tech Stack
+
+- Next.js
+- React
+- Tailwind CSS
+- Supabase
+- OpenAI API
+- Recharts
+
+## Project Structure
+
+```text
+src/
+  app/
+    api/
+      classify-category/
+        route.ts
+  components/
+    AuthGate.tsx
+    CurrentSession.tsx
+    DailyReview.tsx
+    RecordInput.tsx
+    TimeTracker.tsx
+    Timeline.tsx
+  hooks/
+    useTimeRecords.ts
+  lib/
+    db.ts
+    supabase.ts
+    time.ts
+  types/
+    index.ts
+
+
+## How It Works
+
+### Record flow
+- The app keeps track of the current ongoing session.
+- You enter what you were just doing.
+- The app sends the label to a server-side API route.
+- The server calls OpenAI to classify the label into a fixed category set.
+- The record is saved to Supabase with: label, start time, end time, category
+
+### Review flow
+- Select a date in the 回顾 tab.
+- The app filters records for that day.
+- It shows:all records for the day, total tracked duration, category breakdown, donut chart, Environment Variables
+
+
+
+## Create a .env.local file in the project root:
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-5-nano
+
+
+
+## Install dependencies:
+
+npm install
+
+## Start the dev server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
+Authentication
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app uses Supabase Auth.
 
-## Learn More
+Current setup:
 
-To learn more about Next.js, take a look at the following resources:
+email-based sign-in
+authenticated users can only access their own records via RLS policies
+AI Classification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Category assignment is handled server-side through src/app/api/classify-category/route.ts.

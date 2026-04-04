@@ -1,23 +1,27 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { TimeRecord } from "@/types";
+import type { TimeRecord, Category } from "@/types";
+import { CATEGORIES, CATEGORY_LABELS } from "@/types";
 import { formatDuration, formatTime } from "@/lib/time";
 
 interface TimelineProps {
   records: TimeRecord[];
   onUpdateLabel: (id: string, label: string) => void;
+  onUpdateCategory: (id: string, category: Category) => void;
   onDeleteLatest: () => void;
 }
 
 function TimelineItem({
   record,
   onUpdateLabel,
+  onUpdateCategory,
   isLatest,
   onDelete,
 }: {
   record: TimeRecord;
   onUpdateLabel: (id: string, label: string) => void;
+  onUpdateCategory: (id: string, category: Category) => void;
   isLatest: boolean;
   onDelete?: () => void;
 }) {
@@ -55,7 +59,7 @@ function TimelineItem({
         }
       }}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-3">
         {editing ? (
           <textarea
             ref={textareaRef}
@@ -86,21 +90,41 @@ function TimelineItem({
             {record.label}
           </span>
         )}
+
         <span className="text-sm text-zinc-400 dark:text-zinc-500 font-mono whitespace-nowrap pt-0.5">
           {formatDuration(record.endTime - record.startTime)}
         </span>
       </div>
-      <div className="flex items-center justify-between mt-1">
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">
-          {formatTime(record.startTime)} – {formatTime(record.endTime)}
-        </p>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <select
+            value={record.category ?? "Work"}
+            onChange={(e) =>
+              onUpdateCategory(record.id, e.target.value as Category)
+            }
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-1 text-xs text-zinc-700 dark:text-zinc-200"
+          >
+           {CATEGORIES.map((item) => (
+  <option key={item} value={item}>
+    {CATEGORY_LABELS[item]}
+  </option>
+))}
+          </select>
+
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
+            {formatTime(record.startTime)} – {formatTime(record.endTime)}
+          </p>
+        </div>
+
         {isLatest && onDelete && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               if (confirm("确定撤销这条记录吗？")) onDelete();
             }}
-            className="text-xs text-red-400 hover:text-red-500 transition-colors"
+            className="text-xs text-red-400 hover:text-red-500 transition-colors shrink-0"
           >
             撤销
           </button>
@@ -110,7 +134,12 @@ function TimelineItem({
   );
 }
 
-export function Timeline({ records, onUpdateLabel, onDeleteLatest }: TimelineProps) {
+export function Timeline({
+  records,
+  onUpdateLabel,
+  onUpdateCategory,
+  onDeleteLatest,
+}: TimelineProps) {
   if (records.length === 0) {
     return (
       <p className="text-center text-zinc-400 dark:text-zinc-500 py-8 text-sm">
@@ -119,7 +148,7 @@ export function Timeline({ records, onUpdateLabel, onDeleteLatest }: TimelinePro
     );
   }
 
-  const reversed = [...records].reverse();
+  const reversed = [...records].reverse().slice(0, 10);
 
   return (
     <div className="flex flex-col gap-3">
@@ -128,6 +157,7 @@ export function Timeline({ records, onUpdateLabel, onDeleteLatest }: TimelinePro
           key={record.id}
           record={record}
           onUpdateLabel={onUpdateLabel}
+          onUpdateCategory={onUpdateCategory}
           isLatest={index === 0}
           onDelete={index === 0 ? onDeleteLatest : undefined}
         />

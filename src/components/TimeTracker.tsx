@@ -4,24 +4,43 @@ import { useTimeRecords } from "@/hooks/useTimeRecords";
 import { CurrentSession } from "./CurrentSession";
 import { RecordInput } from "./RecordInput";
 import { Timeline } from "./Timeline";
-import { DataBackup } from "./DataBackup";
-import { WechatCTA } from "./WechatCTA";
+import DailyReview from "@/components/DailyReview";
 
-export function TimeTracker() {
-  const { records, sessionStart, hydrated, addRecord, updateLabel, deleteLatestRecord, importRecords } =
-    useTimeRecords();
+export function TimeTracker({
+  activeTab,
+}: {
+  activeTab: "track" | "review";
+}) {
+  const {
+    records,
+    sessionStart,
+    hydrated,
+    addRecord,
+    updateLabel,
+    updateCategory,
+    deleteLatestRecord,
+  } = useTimeRecords();
 
   if (!hydrated) {
     return null;
   }
 
+  if (activeTab === "review") {
+    return <DailyReview records={records} />;
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {sessionStart && <CurrentSession sessionStart={sessionStart} />}
+
       <RecordInput onSubmit={addRecord} />
-      <Timeline records={records} onUpdateLabel={updateLabel} onDeleteLatest={deleteLatestRecord} />
-      <DataBackup records={records} onImport={importRecords} />
-      <WechatCTA />
+
+      <Timeline
+        records={records}
+        onUpdateLabel={updateLabel}
+        onUpdateCategory={updateCategory}
+        onDeleteLatest={deleteLatestRecord}
+      />
     </div>
   );
 }
