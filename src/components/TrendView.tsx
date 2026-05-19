@@ -378,25 +378,31 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">趋势</h2>
+      <div className="space-y-1.5">
+  <div className="flex items-center justify-between gap-3">
+    <h2 className="text-xl font-semibold">近期趋势</h2>
 
-        <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-white/5 p-1">
-          {[7, 30, 90].map((days) => (
-            <button
-              key={days}
-              onClick={() => setRangeDays(days as RangeDays)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs transition ${
-                rangeDays === days
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
-                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-              }`}
-            >
-              {days}天
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-white/5 p-1">
+      {[7, 30, 90].map((days) => (
+        <button
+          key={days}
+          onClick={() => setRangeDays(days as RangeDays)}
+          className={`rounded-lg px-2.5 py-1.5 text-xs transition ${
+            rangeDays === days
+              ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+              : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+          }`}
+        >
+          {days}天
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div className="text-sm text-zinc-500 dark:text-zinc-400">
+    {rangeLabel}
+  </div>
+</div>
 
       {!hasAnyEffectiveRecord ? (
         <div className="rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-5 text-sm text-zinc-500 dark:text-white/60">
@@ -410,9 +416,9 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
             <div className="mb-5 space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-base font-semibold">活动节律</h3>
+                  <h3 className="text-base font-semibold">热力图</h3>
                   <p className="mt-1 text-xs text-zinc-500 dark:text-white/50">
-                    看这一类活动在过去一段时间里的出现频率和投入程度。
+                    此类活动的频率和耗时强度。
                   </p>
                 </div>
 
@@ -429,10 +435,6 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div className="text-center text-sm font-medium text-zinc-500 dark:text-white/60">
-                {rangeLabel}
               </div>
             </div>
 
@@ -524,9 +526,9 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
           <div className="rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-4">
             <div className="mb-4">
-              <h3 className="text-base font-semibold">时间结构</h3>
+              <h3 className="text-base font-semibold">总体时间构成</h3>
               <p className="mt-1 text-xs text-zinc-500 dark:text-white/50">
-                {rangeLabel}，已记录时间的分类占比。记录中断不计入统计。
+                已记录时间的分类占比。记录中断不计入统计。
               </p>
             </div>
 
