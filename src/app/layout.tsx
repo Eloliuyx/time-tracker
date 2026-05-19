@@ -6,12 +6,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#18181b",
 };
 
 export const metadata: Metadata = {
   title: "时间沙漏",
-  description: "倒叙标记式时间记录工具",
+  description: "轻量记录你的时间流向。",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
@@ -30,10 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="zh-CN"
-      className="h-full antialiased"
-    >
+    <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <SwRegister />
         {children}
