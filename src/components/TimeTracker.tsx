@@ -5,21 +5,23 @@ import { CurrentSession } from "./CurrentSession";
 import { RecordInput } from "./RecordInput";
 import { Timeline } from "./Timeline";
 import DailyReview from "@/components/DailyReview";
+import TrendView from "@/components/TrendView";
 
 export function TimeTracker({
   activeTab,
 }: {
-  activeTab: "track" | "review";
+  activeTab: "track" | "review" | "trend";
 }) {
-  const {
-    records,
-    sessionStart,
-    hydrated,
-    addRecord,
-    updateLabel,
-    updateCategory,
-    deleteLatestRecord,
-  } = useTimeRecords();
+const {
+  records,
+  sessionStart,
+  hydrated,
+  interruptedNotice,
+  addRecord,
+  updateLabel,
+  updateCategory,
+  deleteLatestRecord,
+} = useTimeRecords();
 
   if (!hydrated) {
     return null;
@@ -29,18 +31,28 @@ export function TimeTracker({
     return <DailyReview records={records} />;
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      {sessionStart && <CurrentSession sessionStart={sessionStart} />}
+  if (activeTab === "trend") {
+  return <TrendView records={records} />;
+}
 
-      <RecordInput onSubmit={addRecord} />
+return (
+  <div className="flex flex-col gap-6">
+    {sessionStart && <CurrentSession sessionStart={sessionStart} />}
 
-      <Timeline
-        records={records}
-        onUpdateLabel={updateLabel}
-        onUpdateCategory={updateCategory}
-        onDeleteLatest={deleteLatestRecord}
-      />
-    </div>
-  );
+    {interruptedNotice && (
+      <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+        {interruptedNotice}
+      </div>
+    )}
+
+    <RecordInput onSubmit={addRecord} />
+
+    <Timeline
+      records={records}
+      onUpdateLabel={updateLabel}
+      onUpdateCategory={updateCategory}
+      onDeleteLatest={deleteLatestRecord}
+    />
+  </div>
+);
 }

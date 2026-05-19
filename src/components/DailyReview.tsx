@@ -133,6 +133,7 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
 
   const dayRecords = useMemo(() => {
     return [...records]
+    .filter((record) => record.category !== "Interrupted")
       .filter((record) => toLocalDateString(record.startTime) === selectedDate)
       .sort((a, b) => a.startTime - b.startTime);
   }, [records, selectedDate]);

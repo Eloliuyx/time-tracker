@@ -5,7 +5,8 @@ import { TimeTracker } from "@/components/TimeTracker";
 import AuthGate from "@/components/AuthGate";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"track" | "review">("track");
+  const [activeTab, setActiveTab] =
+  useState<"track" | "review" | "trend">("track");
 
   return (
     <AuthGate>
@@ -41,6 +42,17 @@ export default function Home() {
                 }`}
               >
                 回顾
+              </button>
+
+              <button
+                onClick={() => setActiveTab("trend")}
+                className={`rounded-lg px-3 py-1.5 text-sm transition ${
+                  activeTab === "trend"
+                   ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                }`}
+              >
+                趋势
               </button>
             </div>
           </div>

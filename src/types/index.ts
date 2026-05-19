@@ -1,4 +1,20 @@
+export const CATEGORIES = [
+  "Work",
+  "Learning",
+  "Admin",
+  "Life",
+  "Self-Care",
+  "Exercise",
+  "Entertainment",
+  "Rest",
+  "Interrupted",
+] as const;
+
 export type Category = (typeof CATEGORIES)[number];
+
+export const USER_CATEGORIES = CATEGORIES.filter(
+  (category) => category !== "Interrupted"
+) as Exclude<Category, "Interrupted">[];
 
 export interface TimeRecord {
   id: string;
@@ -19,18 +35,6 @@ export interface TimeRecordRow {
   updated_at?: string;
 }
 
-export const CATEGORIES = [
-  "Work",
-  "Learning",
-  "Admin",
-  "Life",
-  "Self-Care",
-  "Exercise",
-  "Entertainment",
-  "Rest",
-] as const;
-
-
 export const CATEGORY_LABELS: Record<Category, string> = {
   Work: "工作",
   Learning: "学习",
@@ -40,7 +44,9 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   Exercise: "运动",
   Entertainment: "娱乐",
   Rest: "休息",
+  Interrupted: "记录中断",
 };
+
 export function getCategoryLabel(category: Category | null): string {
   if (!category) return "未分类";
   return CATEGORY_LABELS[category];

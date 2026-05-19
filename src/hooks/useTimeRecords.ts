@@ -11,6 +11,9 @@ import {
   setSessionStart,
 } from "@/lib/db";
 
+const MAX_ACTIVE_SESSION_MS = 24 * 60 * 60 * 1000;
+const INTERRUPTED_LABEL = "记录中断";
+
 async function classifyCategory(label: string): Promise<Category | null> {
   try {
     const response = await fetch("/api/classify-category", {
@@ -30,7 +33,13 @@ async function classifyCategory(label: string): Promise<Category | null> {
     }
 
     const data = JSON.parse(text);
-    return data.category ?? null;
+const category = data.category ?? null;
+
+if (category === "Interrupted") {
+  return null;
+}
+
+return category;
   } catch (error) {
     console.error("Category classification error:", error);
     return null;
@@ -41,6 +50,7 @@ export function useTimeRecords() {
   const [records, setRecords] = useState<TimeRecord[]>([]);
   const [initialStart, setInitialStart] = useState<number | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [interruptedNotice, setInterruptedNotice] = useState<string | null>(null);
 
   const sessionStart = useMemo(() => {
     if (records.length > 0) return records[records.length - 1].endTime;
@@ -50,12 +60,40 @@ export function useTimeRecords() {
   useEffect(() => {
     async function init() {
       const storedRecords = await getRecords();
-      setRecords(storedRecords);
+      const now = Date.now();
 
-      if (storedRecords.length === 0) {
-        const start = (await getSessionStart()) || Date.now();
-        await setSessionStart(start);
-        setInitialStart(start);
+      let start: number | null = null;
+
+      if (storedRecords.length > 0) {
+        start = storedRecords[storedRecords.length - 1].endTime;
+      } else {
+        start = (await getSessionStart()) || now;
+      }
+
+      if (start && now - start > MAX_ACTIVE_SESSION_MS) {
+        const interruptedRecord: TimeRecord = {
+          id: generateId(),
+          label: INTERRUPTED_LABEL,
+          startTime: start,
+          endTime: now,
+          category: "Interrupted",
+        };
+
+        const nextRecords = [...storedRecords, interruptedRecord];
+
+        setRecords(nextRecords);
+        setInitialStart(null);
+        setInterruptedNotice("上次记录似乎中断了，已为你从现在重新开始。");
+
+        await putRecord(interruptedRecord);
+        await setSessionStart(now);
+      } else {
+        setRecords(storedRecords);
+
+        if (storedRecords.length === 0) {
+          await setSessionStart(start);
+          setInitialStart(start);
+        }
       }
 
       setHydrated(true);
@@ -86,6 +124,7 @@ export function useTimeRecords() {
 
       await putRecord(newRecord);
       await setSessionStart(now);
+      setInterruptedNotice(null);
     },
     [sessionStart]
   );
@@ -142,6 +181,7 @@ export function useTimeRecords() {
     records,
     sessionStart,
     hydrated,
+    interruptedNotice,
     addRecord,
     updateLabel,
     updateCategory,

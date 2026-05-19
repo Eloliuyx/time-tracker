@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { TimeRecord, Category } from "@/types";
-import { CATEGORIES, CATEGORY_LABELS } from "@/types";
+import { USER_CATEGORIES, CATEGORY_LABELS } from "@/types";
 import { formatDuration, formatTime } from "@/lib/time";
 
 interface TimelineProps {
@@ -107,11 +107,17 @@ function TimelineItem({
   <option value="" disabled>
     未分类
   </option>
-  {CATEGORIES.map((item) => (
-    <option key={item} value={item}>
-      {CATEGORY_LABELS[item]}
-    </option>
-  ))}
+      {record.category === "Interrupted" && (
+  <option value="Interrupted">
+    {CATEGORY_LABELS.Interrupted}
+  </option>
+)}
+
+{USER_CATEGORIES.map((item) => (
+  <option key={item} value={item}>
+    {CATEGORY_LABELS[item]}
+  </option>
+))}
 </select>
 
           <p className="text-xs text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
