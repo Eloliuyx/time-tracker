@@ -6,22 +6,25 @@ import { RecordInput } from "./RecordInput";
 import { Timeline } from "./Timeline";
 import DailyReview from "@/components/DailyReview";
 import TrendView from "@/components/TrendView";
+import { useI18n } from "@/lib/i18n";
 
 export function TimeTracker({
   activeTab,
 }: {
   activeTab: "track" | "review" | "trend";
 }) {
-const {
-  records,
-  sessionStart,
-  hydrated,
-  interruptedNotice,
-  addRecord,
-  updateLabel,
-  updateCategory,
-  deleteLatestRecord,
-} = useTimeRecords();
+  const { t } = useI18n();
+
+  const {
+    records,
+    sessionStart,
+    hydrated,
+    interruptedNotice,
+    addRecord,
+    updateLabel,
+    updateCategory,
+    deleteLatestRecord,
+  } = useTimeRecords();
 
   if (!hydrated) {
     return null;
@@ -32,27 +35,27 @@ const {
   }
 
   if (activeTab === "trend") {
-  return <TrendView records={records} />;
-}
+    return <TrendView records={records} />;
+  }
 
-return (
-  <div className="flex flex-col gap-6">
-    {sessionStart && <CurrentSession sessionStart={sessionStart} />}
+  return (
+    <div className="flex flex-col gap-6">
+      {sessionStart && <CurrentSession sessionStart={sessionStart} />}
 
-    {interruptedNotice && (
-      <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-        {interruptedNotice}
-      </div>
-    )}
+      {interruptedNotice && (
+        <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+          {t.track.interruptedNotice}
+        </div>
+      )}
 
-    <RecordInput onSubmit={addRecord} />
+      <RecordInput onSubmit={addRecord} />
 
-    <Timeline
-      records={records}
-      onUpdateLabel={updateLabel}
-      onUpdateCategory={updateCategory}
-      onDeleteLatest={deleteLatestRecord}
-    />
-  </div>
-);
+      <Timeline
+        records={records}
+        onUpdateLabel={updateLabel}
+        onUpdateCategory={updateCategory}
+        onDeleteLatest={deleteLatestRecord}
+      />
+    </div>
+  );
 }

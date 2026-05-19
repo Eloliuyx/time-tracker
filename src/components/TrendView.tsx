@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import type { Category, TimeRecord } from "@/types";
-import { CATEGORY_LABELS, USER_CATEGORIES } from "@/types";
+import { USER_CATEGORIES } from "@/types";
+import { useI18n } from "@/lib/i18n";
 
 type RangeDays = 7 | 30 | 90;
 type DisplayCategory = Exclude<Category, "Interrupted"> | "Uncategorized";
+type Language = "zh" | "en";
 
 interface DayBucket {
   date: string;
@@ -38,9 +40,17 @@ function getShortDateLabel(dateString: string): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-function getChineseDateLabel(dateString: string): string {
+function getLocalizedDateLabel(dateString: string, language: Language): string {
   const d = new Date(`${dateString}T00:00:00`);
-  return `${d.getMonth() + 1}月${d.getDate()}日`;
+
+  if (language === "zh") {
+    return `${d.getMonth() + 1}月${d.getDate()}日`;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(d);
 }
 
 function startOfLocalDay(date: Date): Date {
@@ -66,11 +76,6 @@ function getRangeDates(rangeDays: RangeDays): string[] {
 function getCategoryKey(category: Category | null): string {
   if (!category) return "Uncategorized";
   return category;
-}
-
-function getDisplayLabel(category: string): string {
-  if (category === "Uncategorized") return "未分类";
-  return CATEGORY_LABELS[category as Category];
 }
 
 function splitRecordByDay(record: TimeRecord): Array<{
@@ -277,18 +282,56 @@ function getBarClass(category: string): string {
   return palette[category] ?? "bg-zinc-500";
 }
 
-function getRangeLabel(rangeDays: RangeDays, buckets: DayBucket[]): string {
+function getRangeLabel(
+  rangeDays: RangeDays,
+  buckets: DayBucket[],
+  language: Language
+): string {
   const first = buckets[0];
   const last = buckets[buckets.length - 1];
 
-  if (!first || !last) return `过去 ${rangeDays} 天`;
+  if (!first || !last) {
+    return language === "zh" ? `过去 ${rangeDays} 天` : `Past ${rangeDays} days`;
+  }
 
-  return `过去 ${rangeDays} 天 (${getChineseDateLabel(
-    first.date
-  )} – ${getChineseDateLabel(last.date)})`;
+  const start = getLocalizedDateLabel(first.date, language);
+  const end = getLocalizedDateLabel(last.date, language);
+
+  return language === "zh"
+    ? `过去 ${rangeDays} 天 (${start} – ${end})`
+    : `Past ${rangeDays} days (${start} – ${end})`;
 }
 
 export default function TrendView({ records }: { records: TimeRecord[] }) {
+  const { t, language } = useI18n();
+
+  const copy = {
+    title: language === "zh" ? "近期趋势" : "Recent Trends",
+    empty:
+      language === "zh"
+        ? `最近还没有可分析的记录。\n先记录几天，再回来看看时间趋势。`
+        : `No analyzable records yet.\nTrack a few days first, then come back to review your trends.`,
+    heatmapTitle: language === "zh" ? "热力图" : "Heatmap",
+    heatmapSubtitle:
+      language === "zh"
+        ? "此类活动的频率和耗时强度。"
+        : "Frequency and time intensity for this category.",
+    days: language === "zh" ? "天" : "d",
+    activeDays: language === "zh" ? "出现天数" : "Active days",
+    total: language === "zh" ? "总时长" : "Total time",
+    average: language === "zh" ? "出现日均" : "Avg active day",
+    highest: language === "zh" ? "最高一天" : "Highest day",
+    none: language === "zh" ? "暂无" : "None",
+    noRecords: language === "zh" ? "无记录" : "No record on that day",
+    zeroCategory:
+      language === "zh" ? "有记录但该类为 0" : "Recorded day; 0 mins spent in this category",
+    structureTitle: language === "zh" ? "总体时间构成" : "Time Structure",
+    structureSubtitle:
+      language === "zh"
+        ? "已记录时间的分类占比。记录中断不计入统计。"
+        : "Category breakdown of recorded time. Interrupted sessions are excluded.",
+  };
+
   const [rangeDays, setRangeDays] = useState<RangeDays>(30);
   const [selectedCategory, setSelectedCategory] =
     useState<DisplayCategory>("Work");
@@ -297,6 +340,11 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
     () => buildDayBuckets(records, rangeDays),
     [records, rangeDays]
   );
+
+  const getDisplayLabel = (category: string): string => {
+    if (category === "Uncategorized") return t.categories.Uncategorized;
+    return t.categories[category as Category];
+  };
 
   const structureData = useMemo(() => {
     const totals = new Map<string, number>();
@@ -322,7 +370,7 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
       .sort((a, b) => b.duration - a.duration);
 
     return { totalMs, items };
-  }, [buckets]);
+  }, [buckets, t.categories]);
 
   const categoryOptions: DisplayCategory[] = useMemo(() => {
     return [...USER_CATEGORIES, "Uncategorized"];
@@ -373,42 +421,41 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
   const hasAnyEffectiveRecord = structureData.totalMs > 0;
   const heatmapColumns = getHeatmapColumns(rangeDays);
-  const rangeLabel = getRangeLabel(rangeDays, buckets);
+  const rangeLabel = getRangeLabel(rangeDays, buckets, language);
   const tileTintClass = getTintClass(actualSelectedCategory);
 
   return (
     <section className="space-y-4">
       <div className="space-y-1.5">
-  <div className="flex items-center justify-between gap-3">
-    <h2 className="text-xl font-semibold">近期趋势</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold">{copy.title}</h2>
 
-    <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-white/5 p-1">
-      {[7, 30, 90].map((days) => (
-        <button
-          key={days}
-          onClick={() => setRangeDays(days as RangeDays)}
-          className={`rounded-lg px-2.5 py-1.5 text-xs transition ${
-            rangeDays === days
-              ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
-              : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-          }`}
-        >
-          {days}天
-        </button>
-      ))}
-    </div>
-  </div>
+          <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-white/5 p-1">
+            {[7, 30, 90].map((days) => (
+              <button
+                key={days}
+                onClick={() => setRangeDays(days as RangeDays)}
+                className={`rounded-lg px-2.5 py-1.5 text-xs transition ${
+                  rangeDays === days
+                    ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                }`}
+              >
+                {days}
+                {copy.days}
+              </button>
+            ))}
+          </div>
+        </div>
 
-  <div className="text-sm text-zinc-500 dark:text-zinc-400">
-    {rangeLabel}
-  </div>
-</div>
+        <div className="text-sm text-zinc-500 dark:text-zinc-400">
+          {rangeLabel}
+        </div>
+      </div>
 
       {!hasAnyEffectiveRecord ? (
-        <div className="rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-5 text-sm text-zinc-500 dark:text-white/60">
-          最近 {rangeDays} 天还没有可分析的记录。
-          <br />
-          先记录几天，再回来看看时间趋势。
+        <div className="whitespace-pre-line rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-5 text-sm text-zinc-500 dark:text-white/60">
+          {copy.empty}
         </div>
       ) : (
         <>
@@ -416,9 +463,11 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
             <div className="mb-5 space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-base font-semibold">热力图</h3>
+                  <h3 className="text-base font-semibold">
+                    {copy.heatmapTitle}
+                  </h3>
                   <p className="mt-1 text-xs text-zinc-500 dark:text-white/50">
-                    此类活动的频率和耗时强度。
+                    {copy.heatmapSubtitle}
                   </p>
                 </div>
 
@@ -441,16 +490,17 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
             <div className="mb-4 grid grid-cols-2 gap-2 text-sm">
               <div className={`rounded-xl px-3 py-3 ${tileTintClass}`}>
                 <div className="text-xs text-zinc-400 dark:text-white/40">
-                  出现天数
+                  {copy.activeDays}
                 </div>
                 <div className="mt-1 font-medium">
-                  {selectedStats.activeDays.length}天
+                  {selectedStats.activeDays.length}
+                  {copy.days}
                 </div>
               </div>
 
               <div className={`rounded-xl px-3 py-3 ${tileTintClass}`}>
                 <div className="text-xs text-zinc-400 dark:text-white/40">
-                  总时长
+                  {copy.total}
                 </div>
                 <div className="mt-1 font-medium">
                   {formatDuration(selectedStats.totalMs)}
@@ -459,7 +509,7 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
               <div className={`rounded-xl px-3 py-3 ${tileTintClass}`}>
                 <div className="text-xs text-zinc-400 dark:text-white/40">
-                  出现日均
+                  {copy.average}
                 </div>
                 <div className="mt-1 font-medium">
                   {selectedStats.activeDays.length > 0
@@ -472,16 +522,17 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
               <div className={`rounded-xl px-3 py-3 ${tileTintClass}`}>
                 <div className="text-xs text-zinc-400 dark:text-white/40">
-                  最高一天
+                  {copy.highest}
                 </div>
                 <div className="mt-1 font-medium">
                   {selectedStats.highestDay
-                    ? `${getChineseDateLabel(
-                        selectedStats.highestDay.date
+                    ? `${getLocalizedDateLabel(
+                        selectedStats.highestDay.date,
+                        language
                       )} · ${formatDuration(
                         selectedStats.highestDay.selectedMs
                       )}`
-                    : "暂无"}
+                    : copy.none}
                 </div>
               </div>
             </div>
@@ -496,10 +547,10 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
                 {selectedStats.values.map((day) => (
                   <div
                     key={day.date}
-                    title={`${getChineseDateLabel(day.date)} · ${
+                    title={`${getLocalizedDateLabel(day.date, language)} · ${
                       day.hasAnyRecord
                         ? formatDuration(day.selectedMs)
-                        : "无记录"
+                        : copy.noRecords
                     }`}
                     className={`aspect-square w-full rounded-[5px] ${getIntensityClass(
                       actualSelectedCategory,
@@ -514,11 +565,11 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
               <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-zinc-400 dark:text-white/40">
                 <div className="flex items-center gap-1">
                   <span className="h-3 w-3 rounded-[3px] border border-dashed border-zinc-300 dark:border-zinc-700" />
-                  <span>无记录</span>
+                  <span>{copy.noRecords}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="h-3 w-3 rounded-[3px] bg-zinc-100 dark:bg-zinc-800" />
-                  <span>有记录但该类为 0</span>
+                  <span>{copy.zeroCategory}</span>
                 </div>
               </div>
             </div>
@@ -526,9 +577,11 @@ export default function TrendView({ records }: { records: TimeRecord[] }) {
 
           <div className="rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-4">
             <div className="mb-4">
-              <h3 className="text-base font-semibold">总体时间构成</h3>
+              <h3 className="text-base font-semibold">
+                {copy.structureTitle}
+              </h3>
               <p className="mt-1 text-xs text-zinc-500 dark:text-white/50">
-                已记录时间的分类占比。记录中断不计入统计。
+                {copy.structureSubtitle}
               </p>
             </div>
 

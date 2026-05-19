@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { TimeRecord, Category } from "@/types";
-import { USER_CATEGORIES, CATEGORY_LABELS } from "@/types";
+import { USER_CATEGORIES } from "@/types";
 import { formatDuration, formatTime } from "@/lib/time";
+import { useI18n } from "@/lib/i18n";
 
 interface TimelineProps {
   records: TimeRecord[];
@@ -25,6 +26,7 @@ function TimelineItem({
   isLatest: boolean;
   onDelete?: () => void;
 }) {
+  const { t } = useI18n();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(record.label);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -99,26 +101,25 @@ function TimelineItem({
       <div className="mt-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <select
-  value={record.category ?? ""}
-  onChange={(e) => onUpdateCategory(record.id, e.target.value as Category)}
-  onClick={(e) => e.stopPropagation()}
-  className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-1 text-xs text-zinc-700 dark:text-zinc-200"
->
-  <option value="" disabled>
-    未分类
-  </option>
-      {record.category === "Interrupted" && (
-  <option value="Interrupted">
-    {CATEGORY_LABELS.Interrupted}
-  </option>
-)}
+            value={record.category ?? ""}
+            onChange={(e) => onUpdateCategory(record.id, e.target.value as Category)}
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-1 text-xs text-zinc-700 dark:text-zinc-200"
+          >
+            <option value="" disabled>
+              {t.categories.Uncategorized}
+            </option>
 
-{USER_CATEGORIES.map((item) => (
-  <option key={item} value={item}>
-    {CATEGORY_LABELS[item]}
-  </option>
-))}
-</select>
+            {record.category === "Interrupted" && (
+              <option value="Interrupted">{t.categories.Interrupted}</option>
+            )}
+
+            {USER_CATEGORIES.map((item) => (
+              <option key={item} value={item}>
+                {t.categories[item]}
+              </option>
+            ))}
+          </select>
 
           <p className="text-xs text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
             {formatTime(record.startTime)} – {formatTime(record.endTime)}
@@ -129,11 +130,11 @@ function TimelineItem({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (confirm("确定撤销这条记录吗？")) onDelete();
+              if (confirm(t.track.confirmUndo)) onDelete();
             }}
             className="text-xs text-red-400 hover:text-red-500 transition-colors shrink-0"
           >
-            撤销
+            {t.track.undo}
           </button>
         )}
       </div>
@@ -147,10 +148,12 @@ export function Timeline({
   onUpdateCategory,
   onDeleteLatest,
 }: TimelineProps) {
+  const { t } = useI18n();
+
   if (records.length === 0) {
     return (
       <p className="text-center text-zinc-400 dark:text-zinc-500 py-8 text-sm">
-        还没有记录，输入刚刚做的事情开始吧
+        {t.track.emptyTimeline}
       </p>
     );
   }

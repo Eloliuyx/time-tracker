@@ -32,6 +32,7 @@ export async function getRecords(): Promise<TimeRecord[]> {
     .from("time_records")
     .select("*")
     .eq("user_id", userId)
+    .order("end_time", { ascending: true })
     .order("start_time", { ascending: true });
 
   if (error) throw error;

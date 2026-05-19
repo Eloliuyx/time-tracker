@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { TimeTracker } from "@/components/TimeTracker";
 import AuthGate from "@/components/AuthGate";
+import { useI18n } from "@/lib/i18n";
+
+type ActiveTab = "track" | "review" | "trend";
 
 export default function Home() {
-  const [activeTab, setActiveTab] =
-  useState<"track" | "review" | "trend">("track");
+  const { t } = useI18n();
+  const [activeTab, setActiveTab] = useState<ActiveTab>("track");
 
   return (
     <AuthGate>
@@ -16,10 +19,10 @@ export default function Home() {
             <h1 className="text-xl font-semibold flex items-center gap-2">
               <img
                 src="/logo.svg"
-                alt="时间沙漏"
+                alt={t.appName}
                 className="w-7 h-7 dark:invert"
               />
-              时间沙漏
+              {t.appName}
             </h1>
 
             <div className="flex items-center gap-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-white/5 p-1">
@@ -31,8 +34,9 @@ export default function Home() {
                     : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                 }`}
               >
-                记录
+                {t.nav.track}
               </button>
+
               <button
                 onClick={() => setActiveTab("review")}
                 className={`rounded-lg px-3 py-1.5 text-sm transition ${
@@ -41,18 +45,18 @@ export default function Home() {
                     : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                 }`}
               >
-                回顾
+                {t.nav.review}
               </button>
 
               <button
                 onClick={() => setActiveTab("trend")}
                 className={`rounded-lg px-3 py-1.5 text-sm transition ${
                   activeTab === "trend"
-                   ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+                    ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
                     : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                 }`}
               >
-                趋势
+                {t.nav.trend}
               </button>
             </div>
           </div>

@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { TimeRecord, Category } from "@/types";
-import { CATEGORY_LABELS } from "@/types";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { useI18n } from "@/lib/i18n";
 
 function formatDuration(ms: number): string {
   const totalMinutes = Math.max(0, Math.round(ms / 60000));
@@ -15,11 +15,15 @@ function formatDuration(ms: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-function formatTimeRange(startTime: number, endTime: number): string {
+function formatTimeRange(
+  startTime: number,
+  endTime: number,
+  language: "zh" | "en"
+): string {
   const start = new Date(startTime);
   const end = new Date(endTime);
 
-  const formatter = new Intl.DateTimeFormat("zh-CN", {
+  const formatter = new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
@@ -34,11 +38,6 @@ function toLocalDateString(timestamp: number): string {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
-}
-
-function getCategoryLabel(category: Category | null): string {
-  if (!category) return "未分类";
-  return CATEGORY_LABELS[category];
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -58,19 +57,20 @@ function CategoryTooltip({
   payload,
 }: {
   active?: boolean;
-  payload?: Array<{ payload: { category: string; duration: number } }>;
+  payload?: Array<{
+    payload: {
+      label: string;
+      duration: number;
+    };
+  }>;
 }) {
   if (!active || !payload?.length) return null;
 
   const item = payload[0].payload;
-  const label =
-    item.category === "Uncategorized"
-      ? "未分类"
-      : CATEGORY_LABELS[item.category as Category];
 
   return (
     <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-sm">
-      <div className="font-medium">{label}</div>
+      <div className="font-medium">{item.label}</div>
       <div className="text-zinc-500 dark:text-zinc-400">
         {formatDuration(item.duration)}
       </div>
@@ -127,13 +127,22 @@ function renderPieLabel({
 }
 
 export default function DailyReview({ records }: { records: TimeRecord[] }) {
+  const { t, language } = useI18n();
+
+  const copy = {
+    title: language === "zh" ? "当日回顾" : "Daily Review",
+    total: language === "zh" ? "今天总计" : "Total",
+    categorySummary: language === "zh" ? "分类汇总" : "Category Summary",
+    empty: language === "zh" ? "这一天还没有记录。" : "No records for this day.",
+  };
+
   const [selectedDate, setSelectedDate] = useState(() => {
     return toLocalDateString(Date.now());
   });
 
   const dayRecords = useMemo(() => {
     return [...records]
-    .filter((record) => record.category !== "Interrupted")
+      .filter((record) => record.category !== "Interrupted")
       .filter((record) => toLocalDateString(record.startTime) === selectedDate)
       .sort((a, b) => a.startTime - b.startTime);
   }, [records, selectedDate]);
@@ -159,17 +168,22 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
         category,
         label:
           category === "Uncategorized"
-            ? "未分类"
-            : CATEGORY_LABELS[category as Category],
+            ? t.categories.Uncategorized
+            : t.categories[category as Category],
         duration,
       }))
       .sort((a, b) => b.duration - a.duration);
-  }, [dayRecords]);
+  }, [dayRecords, t.categories]);
+
+  function getCategoryLabel(category: Category | null): string {
+    if (!category) return t.categories.Uncategorized;
+    return t.categories[category];
+  }
 
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">当日回顾</h2>
+        <h2 className="text-xl font-semibold">{copy.title}</h2>
         <input
           type="date"
           value={selectedDate}
@@ -180,13 +194,13 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
 
       <div className="rounded-2xl border border-zinc-100 dark:border-white/10 bg-white dark:bg-white/5 p-4">
         <div className="mb-4 text-sm text-zinc-500 dark:text-white/70">
-          今天总计：{formatDuration(totalMs)}
+          {copy.total}: {formatDuration(totalMs)}
         </div>
 
         {categoryTotals.length > 0 && (
           <div className="mb-6 rounded-xl border border-zinc-100 dark:border-white/10 bg-zinc-50 dark:bg-black/20 p-4">
             <div className="mb-4 text-sm font-medium text-zinc-700 dark:text-white/80">
-              分类汇总
+              {copy.categorySummary}
             </div>
 
             <div className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
@@ -246,7 +260,7 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
 
         {dayRecords.length === 0 ? (
           <div className="text-sm text-zinc-400 dark:text-white/50">
-            这一天还没有记录。
+            {copy.empty}
           </div>
         ) : (
           <div className="space-y-3">
@@ -257,7 +271,7 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="text-sm text-zinc-500 dark:text-white/60">
-                    {formatTimeRange(record.startTime, record.endTime)}
+                    {formatTimeRange(record.startTime, record.endTime, language)}
                   </div>
                   <div className="text-sm text-zinc-500 dark:text-white/60">
                     {formatDuration(record.endTime - record.startTime)}

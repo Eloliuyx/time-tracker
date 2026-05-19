@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useI18n } from "@/lib/i18n";
 
 export function RecordInput({ onSubmit }: { onSubmit: (label: string) => void }) {
+  const { t } = useI18n();
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -37,7 +39,7 @@ export function RecordInput({ onSubmit }: { onSubmit: (label: string) => void })
           setValue(e.target.value);
           autoResize();
         }}
-        placeholder="刚刚在做什么..."
+        placeholder={t.track.inputPlaceholder}
         rows={1}
         className="flex-1 min-h-[48px] max-h-[120px] px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-base outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-500 transition-shadow resize-none leading-normal"
       />
@@ -46,7 +48,7 @@ export function RecordInput({ onSubmit }: { onSubmit: (label: string) => void })
         disabled={!value.trim()}
         className="h-12 px-5 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium text-base disabled:opacity-40 transition-opacity shrink-0"
       >
-        记录
+        {t.track.submit}
       </button>
     </div>
   );

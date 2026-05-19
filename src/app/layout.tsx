@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { SwRegister } from "@/components/SwRegister";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -11,7 +12,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "时间沙漏",
-  description: "轻量记录你的时间流向。",
+  description: "极简 | 倒叙 | 时间流向记录",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
@@ -33,7 +34,7 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <SwRegister />
-        {children}
+        <I18nProvider>{children}</I18nProvider>
       </body>
     </html>
   );

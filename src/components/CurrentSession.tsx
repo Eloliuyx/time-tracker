@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { formatDuration } from "@/lib/time";
+import { useI18n } from "@/lib/i18n";
 
 export function CurrentSession({ sessionStart }: { sessionStart: number }) {
+  const { t } = useI18n();
   const [elapsed, setElapsed] = useState(() => Date.now() - sessionStart);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export function CurrentSession({ sessionStart }: { sessionStart: number }) {
           <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
         </span>
         <span className="text-sm text-zinc-500 dark:text-zinc-400">
-          进行中
+          {t.track.inProgress}
         </span>
       </div>
       <p className="text-4xl font-mono font-semibold tracking-tight">
