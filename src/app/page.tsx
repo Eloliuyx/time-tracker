@@ -16,9 +16,9 @@ export default function Home() {
       <div className="flex flex-col flex-1 items-center bg-zinc-50 dark:bg-black font-sans">
         <main className="w-full max-w-lg px-4 py-6">
           <div className="mb-6 flex items-center justify-between gap-4">
-            <h1 className="text-xl font-semibold flex items-center gap-2">
+            <h1 className="text-lg font-medium tracking-tight flex items-center gap-2">
               <img
-                src="/logo.svg"
+                src="/favicon.png"
                 alt={t.appName}
                 className="w-7 h-7 dark:invert"
               />

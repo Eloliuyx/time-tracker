@@ -1,6 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <path d="M8 4h16v2c0 4-3.5 7.5-8 10c4.5 2.5 8 6 8 10v2H8v-2c0-4 3.5-7.5 8-10c-4.5-2.5-8-6-8-10V4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M11 6c0 3 2.2 5.5 5 7.5C18.8 11.5 21 9 21 6H11z" fill="currentColor" opacity="0.25"/>
-  <path d="M11 26c0-3 2.2-5.5 5-7.5c2.8 2 5 4.5 5 7.5H11z" fill="currentColor" opacity="0.15"/>
-  <line x1="16" y1="14" x2="16" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H1000V1000H0V0Z" fill="white"/>
+<circle cx="528.5" cy="478" r="312" fill="#353531"/>
+<circle cx="528.5" cy="478" r="230" fill="white"/>
+<rect x="107.5" y="429" width="496" height="463" fill="white"/>
+<circle cx="576.5" cy="740" r="75" fill="#353531"/>
+<circle cx="424.5" cy="734" r="45" fill="#353531"/>
+<circle cx="255.5" cy="628" r="24" fill="#353531"/>
+<circle cx="322.5" cy="690" r="34" fill="#353531"/>
+<rect x="171.388" y="293.834" width="62" height="191" rx="31" transform="rotate(-10 171.388 293.834)" fill="#353531"/>
+<rect x="206.334" y="489.112" width="62" height="191" rx="31" transform="rotate(-100 206.334 489.112)" fill="#353531"/>
 </svg>

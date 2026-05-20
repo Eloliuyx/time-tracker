@@ -2,6 +2,15 @@ import type { Metadata, Viewport } from "next";
 import { SwRegister } from "@/components/SwRegister";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
+import { Noto_Sans_SC } from "next/font/google";
+
+const notoSansSC = Noto_Sans_SC({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cn",
+});
+
+<html lang="zh-CN" className={`h-full antialiased ${notoSansSC.variable}`}></html>
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -11,7 +20,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "时间沙漏",
+  title: "刚才",
   description: "极简 | 倒叙 | 时间流向记录",
   manifest: "/manifest.json",
   icons: {
@@ -20,7 +29,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "时间沙漏",
+    title: "刚才",
     statusBarStyle: "default",
   },
 };

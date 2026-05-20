@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "时间沙漏",
-  "short_name": "时间沙漏",
-  "description": "轻量记录你的时间流向。",
+  "name": "刚才",
+  "short_name": "刚才",
+  "description": "极简 | 倒叙 | 时间流向记录",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

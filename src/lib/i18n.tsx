@@ -66,7 +66,7 @@ const copy: Record<Language, Translation> = {
   zh: {
     languageToggle: "EN | 中",
     signOut: "退出登录",
-    appName: "时间沙漏",
+    appName: "刚才",
 
     nav: {
       track: "记录",
@@ -116,7 +116,7 @@ const copy: Record<Language, Translation> = {
   en: {
     languageToggle: "EN | 中",
     signOut: "Sign out",
-    appName: "Time Sandglass",
+    appName: "JustNow",
 
     nav: {
       track: "Track",
