@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 
 export function LandingPage({ onEnter }: { onEnter: () => void }) {
   const { language, t } = useI18n();
   const [aspectRatio, setAspectRatio] = useState("9 / 19");
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const demoSrc = language === "zh" ? "/demo-zh.mp4" : "/demo-en.mp4";
 
@@ -46,21 +47,25 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
               className="overflow-hidden rounded-[1.75rem] bg-surface-soft border border-border"
               style={{ aspectRatio }}
             >
-              <video
-                key={demoSrc}
-                className="h-full w-full object-contain"
-                src={demoSrc}
-                autoPlay
-                muted
-                loop
-                playsInline
-                onLoadedMetadata={(event) => {
-                  const video = event.currentTarget;
-                  if (video.videoWidth && video.videoHeight) {
-                    setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
-                  }
-                }}
-              />
+                <video
+  ref={videoRef}
+  key={demoSrc}
+  className="h-full w-full object-contain"
+  src={demoSrc}
+  autoPlay
+  muted
+  loop
+  playsInline
+  onLoadedMetadata={(event) => {
+    const video = event.currentTarget;
+
+    video.playbackRate = 1.2;
+
+    if (video.videoWidth && video.videoHeight) {
+      setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
+    }
+  }}
+/>
             </div>
           </div>
         </section>
