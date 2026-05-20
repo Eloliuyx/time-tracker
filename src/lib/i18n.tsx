@@ -23,6 +23,14 @@ type Translation = {
     trend: string;
   };
 
+  landing: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    authButton: string;
+    footer: string;
+  };
+
   auth: {
     signIn: string;
     signUp: string;
@@ -74,6 +82,15 @@ const copy: Record<Language, Translation> = {
       trend: "趋势",
     },
 
+    landing: {
+      eyebrow: "倒叙式时间记录",
+      title: "记录刚刚过去的时间。",
+      subtitle:
+        "不用提前开始计时。只要写下刚刚在做什么，刚才会自动把上一段时间整理成记录。",
+      authButton: "登录 / 注册",
+      footer: "适合日常记录、复盘和看见时间的真实流向。",
+    },
+
     auth: {
       signIn: "登录",
       signUp: "注册",
@@ -122,6 +139,16 @@ const copy: Record<Language, Translation> = {
       track: "Track",
       review: "Review",
       trend: "Trends",
+    },
+
+    landing: {
+      eyebrow: "Reverse time tracking",
+      title: "Log what just happened.",
+      subtitle:
+        "No start button. No timer setup. Just write what you were doing, and JustNow turns the last stretch of time into a record.",
+      authButton: "Log in / Sign up",
+      footer:
+        "A quiet way to review your day and see where your time actually went.",
     },
 
     auth: {

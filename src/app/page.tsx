@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TimeTracker } from "@/components/TimeTracker";
 import AuthGate from "@/components/AuthGate";
+import { LandingPage } from "@/components/LandingPage";
 import { useI18n } from "@/lib/i18n";
 
 type ActiveTab = "track" | "review" | "trend";
@@ -10,6 +11,11 @@ type ActiveTab = "track" | "review" | "trend";
 export default function Home() {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<ActiveTab>("track");
+  const [showAuth, setShowAuth] = useState(false);
+
+  if (!showAuth) {
+    return <LandingPage onEnter={() => setShowAuth(true)} />;
+  }
 
   return (
     <AuthGate>

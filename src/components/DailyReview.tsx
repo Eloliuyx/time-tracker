@@ -281,7 +281,7 @@ export default function DailyReview({ records }: { records: TimeRecord[] }) {
                 <div className="mt-2 text-base">{record.label}</div>
 
                 <div className="mt-1 text-sm text-zinc-400 dark:text-white/50">
-                  {getCategoryLabel(record.category)}
+                  {record.category ? t.categories[record.category] : t.categories.Uncategorized}
                 </div>
               </div>
             ))}

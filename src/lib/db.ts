@@ -28,16 +28,34 @@ async function requireUserId(): Promise<string> {
 export async function getRecords(): Promise<TimeRecord[]> {
   const userId = await requireUserId();
 
-  const { data, error } = await supabase
-    .from("time_records")
-    .select("*")
-    .eq("user_id", userId)
-    .order("end_time", { ascending: true })
-    .order("start_time", { ascending: true });
+  const pageSize = 1000;
+  let from = 0;
+  let allRows: TimeRecordRow[] = [];
 
-  if (error) throw error;
+  while (true) {
+    const to = from + pageSize - 1;
 
-  return (data ?? []).map(mapRowToRecord);
+    const { data, error } = await supabase
+      .from("time_records")
+      .select("*")
+      .eq("user_id", userId)
+      .order("end_time", { ascending: true })
+      .order("start_time", { ascending: true })
+      .range(from, to);
+
+    if (error) throw error;
+
+    const rows = (data ?? []) as TimeRecordRow[];
+    allRows = allRows.concat(rows);
+
+    if (rows.length < pageSize) {
+      break;
+    }
+
+    from += pageSize;
+  }
+
+  return allRows.map(mapRowToRecord);
 }
 
 export async function putRecord(record: TimeRecord): Promise<void> {

@@ -10,7 +10,6 @@ const notoSansSC = Noto_Sans_SC({
   variable: "--font-cn",
 });
 
-<html lang="zh-CN" className={`h-full antialiased ${notoSansSC.variable}`}></html>
 
 export const viewport: Viewport = {
   width: "device-width",

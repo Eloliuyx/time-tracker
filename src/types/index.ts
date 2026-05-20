@@ -34,20 +34,3 @@ export interface TimeRecordRow {
   created_at?: string;
   updated_at?: string;
 }
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  Work: "工作",
-  Learning: "学习",
-  Admin: "事务",
-  Life: "生活",
-  "Self-Care": "自我照料",
-  Exercise: "运动",
-  Entertainment: "娱乐",
-  Rest: "休息",
-  Interrupted: "记录中断",
-};
-
-export function getCategoryLabel(category: Category | null): string {
-  if (!category) return "未分类";
-  return CATEGORY_LABELS[category];
-}
