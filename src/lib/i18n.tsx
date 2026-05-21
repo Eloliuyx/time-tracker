@@ -86,6 +86,9 @@ type Translation = {
   deleting: string;
   deleteSuccess: string;
   deleteError: string;
+  contactTitle: string;
+contactDescription: string;
+contactButton: string;
 };
 };
 
@@ -167,6 +170,9 @@ const copy: Record<Language, Translation> = {
   deleting: "删除中...",
   deleteSuccess: "已删除全部时间记录。",
   deleteError: "删除失败，请稍后再试。",
+  contactTitle: "反馈与联系",
+contactDescription: "有问题、反馈或建议，欢迎联系作者。",
+contactButton: "给作者发邮件",
 },
   },
 
@@ -237,6 +243,10 @@ const copy: Record<Language, Translation> = {
   deleting: "Deleting...",
   deleteSuccess: "All time records have been deleted.",
   deleteError: "Delete failed. Please try again later.",
+  contactTitle: "Feedback & contact",
+contactDescription: "Questions, bugs, or ideas? Send a note to the creator.",
+contactButton: "Email the creator",
+
 },
 
     categories: {

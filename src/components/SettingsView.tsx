@@ -5,6 +5,8 @@ import type { TimeRecord } from "@/types";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 
+const CONTACT_EMAIL = "hello@usejustnow.app";
+
 function formatCsvDate(timestamp: number) {
   return new Date(timestamp).toISOString();
 }
@@ -44,8 +46,11 @@ export function SettingsView({
   const [message, setMessage] = useState<string | null>(null);
 
   const canDelete = confirmText === "DELETE RECORDS";
-
   const recordCount = useMemo(() => records.length, [records]);
+
+  const contactHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+    "JustNow Feedback"
+  )}`;
 
   function handleExportCsv() {
     const csv = buildCsv(records);
@@ -116,6 +121,20 @@ export function SettingsView({
         >
           {t.settings.exportButton}
         </button>
+      </section>
+
+      <section className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 className="text-sm font-medium">{t.settings.contactTitle}</h3>
+        <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+          {t.settings.contactDescription}
+        </p>
+
+        <a
+          href={contactHref}
+          className="mt-4 flex h-11 w-full items-center justify-center rounded-xl border border-zinc-200 bg-white text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900"
+        >
+          {t.settings.contactButton}
+        </a>
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
