@@ -79,9 +79,9 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
             {t.landing.authButton}
           </button>
 
-          <p className="pt-2 text-center text-xs leading-5 text-muted">
-            {t.landing.footer}
-          </p>
+          <p className="mx-auto max-w-[34rem] text-sm font-medium leading-6 text-zinc-700 dark:text-zinc-200">
+  {t.landing.footer}
+</p>
         </section>
       </main>
     </div>
