@@ -106,12 +106,12 @@ const copy: Record<Language, Translation> = {
     },
 
     landing: {
-      eyebrow: "倒叙式时间记录",
-      title: "记录刚刚过去的时间。",
+      eyebrow: "反向时间追踪",
+      title: "拥抱真实的发生。",
       subtitle:
-        "不用提前开始计时。只要写下刚刚在做什么，刚才会自动把上一段时间整理成记录。",
-      authButton: "登录 / 注册",
-      footer: "适合日常记录、复盘和看见时间的真实流向。",
+        "拒绝死板日程表带来的伪计划与真焦虑。做完就记一下，多简单。",
+      authButton: "即刻开始",
+      footer: "百分之百地活在当下。看清你 24 小时每一刻的真实去向。",
     },
 
     auth: {
@@ -188,15 +188,14 @@ contactButton: "给作者发邮件",
       settings: "Settings",
     },
 
-    landing: {
-      eyebrow: "Reverse time tracking",
-      title: "Log what just happened.",
-      subtitle:
-        "No start button. No timer setup. Just write what you were doing, and JustNow turns the last stretch of time into a record.",
-      authButton: "Log in / Sign up",
-      footer:
-        "A quiet way to review your day and see where your time actually went.",
-    },
+landing: {
+  eyebrow: "Reverse Time Tracking",
+  title: "Embrace what actually happened.",
+  subtitle:
+    "Most time tools are just perfectionist wishful thinking. Finished something? Drop a line. It’s that simple.",
+  authButton: "Start Now",
+  footer: "Be 100% present. Own every single minute of your actual life.",
+},
 
     auth: {
       signIn: "Sign in",
