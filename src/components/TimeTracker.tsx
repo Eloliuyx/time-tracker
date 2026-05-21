@@ -7,11 +7,12 @@ import { Timeline } from "./Timeline";
 import DailyReview from "@/components/DailyReview";
 import TrendView from "@/components/TrendView";
 import { useI18n } from "@/lib/i18n";
+import { SettingsView } from "@/components/SettingsView";
 
 export function TimeTracker({
   activeTab,
 }: {
-  activeTab: "track" | "review" | "trend";
+  activeTab: "track" | "review" | "trend" | "settings";
 }) {
   const { t } = useI18n();
 
@@ -24,6 +25,7 @@ export function TimeTracker({
     updateLabel,
     updateCategory,
     deleteLatestRecord,
+    deleteAllUserRecords,
   } = useTimeRecords();
 
   if (!hydrated) {
@@ -37,6 +39,15 @@ export function TimeTracker({
   if (activeTab === "trend") {
     return <TrendView records={records} />;
   }
+
+  if (activeTab === "settings") {
+  return (
+    <SettingsView
+      records={records}
+      onDeleteAllRecords={deleteAllUserRecords}
+    />
+  );
+}
 
   return (
     <div className="flex flex-col gap-6">

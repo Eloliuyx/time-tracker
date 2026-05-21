@@ -138,3 +138,21 @@ export async function setSessionStart(value: number): Promise<void> {
 
   if (error) throw error;
 }
+
+export async function deleteAllRecords(): Promise<void> {
+  const userId = await requireUserId();
+
+  const { error: recordsError } = await supabase
+    .from("time_records")
+    .delete()
+    .eq("user_id", userId);
+
+  if (recordsError) throw recordsError;
+
+  const { error: metaError } = await supabase
+    .from("app_meta")
+    .delete()
+    .eq("user_id", userId);
+
+  if (metaError) throw metaError;
+}

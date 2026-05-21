@@ -9,6 +9,7 @@ import {
   deleteRecord as dbDeleteRecord,
   getSessionStart,
   setSessionStart,
+  deleteAllRecords,
 } from "@/lib/db";
 
 const MAX_ACTIVE_SESSION_MS = 24 * 60 * 60 * 1000;
@@ -36,15 +37,11 @@ async function classifyCategory(label: string): Promise<Category | null> {
       body: JSON.stringify({ label }),
     });
 
-    const text = await response.text();
-    console.log("classify-category status:", response.status);
-    console.log("classify-category body:", text);
-
     if (!response.ok) {
       return null;
     }
 
-    const data = JSON.parse(text);
+    const data = await response.json();
     const category = data.category ?? null;
 
     if (category === "Interrupted") {
@@ -92,50 +89,68 @@ export function useTimeRecords() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function init() {
-      const storedRecords = sortRecords(await getRecords());
-      const now = Date.now();
+      try {
+        const storedRecords = sortRecords(await getRecords());
+        const now = Date.now();
 
-      let start: number | null = null;
+        let start: number | null = null;
 
-      if (storedRecords.length > 0) {
-        start = getLatestEndTime(storedRecords);
-      } else {
-        start = (await getSessionStart()) || now;
-      }
-
-      if (start && now - start > MAX_ACTIVE_SESSION_MS) {
-        const interruptedRecord: TimeRecord = {
-          id: generateId(),
-          label: INTERRUPTED_LABEL,
-          startTime: start,
-          endTime: now,
-          category: "Interrupted",
-        };
-
-        const nextRecords = sortRecords([...storedRecords, interruptedRecord]);
-
-        setRecords(nextRecords);
-        setInitialStart(null);
-        setInterruptedNotice("上次记录似乎中断了，已为你从现在重新开始。");
-
-        await putRecord(interruptedRecord);
-        await setSessionStart(now);
-      } else {
-        setRecords(storedRecords);
-
-        if (storedRecords.length === 0 && start) {
-          await setSessionStart(start);
-          setInitialStart(start);
+        if (storedRecords.length > 0) {
+          start = getLatestEndTime(storedRecords);
         } else {
+          start = (await getSessionStart()) || now;
+        }
+
+        if (cancelled) return;
+
+        if (start && now - start > MAX_ACTIVE_SESSION_MS) {
+          const interruptedRecord: TimeRecord = {
+            id: generateId(),
+            label: INTERRUPTED_LABEL,
+            startTime: start,
+            endTime: now,
+            category: "Interrupted",
+          };
+
+          const nextRecords = sortRecords([...storedRecords, interruptedRecord]);
+
+          setRecords(nextRecords);
           setInitialStart(null);
+          setInterruptedNotice(
+            "上次记录似乎中断了，已为你从现在重新开始。"
+          );
+
+          await putRecord(interruptedRecord);
+          await setSessionStart(now);
+        } else {
+          setRecords(storedRecords);
+
+          if (storedRecords.length === 0 && start) {
+            await setSessionStart(start);
+            setInitialStart(start);
+          } else {
+            setInitialStart(null);
+          }
+
+          setInterruptedNotice(null);
+        }
+      } catch (error) {
+        console.error("Failed to initialize records:", error);
+      } finally {
+        if (!cancelled) {
+          setHydrated(true);
         }
       }
-
-      setHydrated(true);
     }
 
     init();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -167,7 +182,6 @@ export function useTimeRecords() {
 
       const category = await classifyCategory(trimmed);
 
-      // Important:
       // Re-fetch the latest server state right before writing.
       // This prevents an old tab / old PWA window from creating overlapping records.
       const latestRecords = sortRecords(await getRecords());
@@ -182,12 +196,14 @@ export function useTimeRecords() {
         storedSessionStart,
       ].filter((value): value is number => typeof value === "number");
 
-      const safeStartTime = candidates.length > 0 ? Math.max(...candidates) : now;
+      const safeStartTime =
+        candidates.length > 0 ? Math.max(...candidates) : now;
 
       if (safeStartTime >= now) {
         setRecords(latestRecords);
         await setSessionStart(now);
         setInitialStart(latestRecords.length === 0 ? now : null);
+        setInterruptedNotice(null);
         return;
       }
 
@@ -216,13 +232,19 @@ export function useTimeRecords() {
 
   const updateLabel = useCallback(
     async (id: string, label: string) => {
+      const nextLabel = label.trim();
+      if (!nextLabel) return;
+
       setRecords((prev) =>
-        sortRecords(prev.map((r) => (r.id === id ? { ...r, label } : r)))
+        sortRecords(prev.map((record) =>
+          record.id === id ? { ...record, label: nextLabel } : record
+        ))
       );
 
-      const record = records.find((r) => r.id === id);
+      const record = records.find((record) => record.id === id);
+
       if (record) {
-        await putRecord({ ...record, label });
+        await putRecord({ ...record, label: nextLabel });
         await refreshRecords();
       }
     },
@@ -232,10 +254,13 @@ export function useTimeRecords() {
   const updateCategory = useCallback(
     async (id: string, category: Category) => {
       setRecords((prev) =>
-        sortRecords(prev.map((r) => (r.id === id ? { ...r, category } : r)))
+        sortRecords(prev.map((record) =>
+          record.id === id ? { ...record, category } : record
+        ))
       );
 
-      const record = records.find((r) => r.id === id);
+      const record = records.find((record) => record.id === id);
+
       if (record) {
         await putRecord({ ...record, category });
         await refreshRecords();
@@ -254,6 +279,7 @@ export function useTimeRecords() {
 
     const remainingRecords = sortRecords(await getRecords());
     setRecords(remainingRecords);
+    setInterruptedNotice(null);
 
     if (remainingRecords.length === 0) {
       setInitialStart(latest.startTime);
@@ -261,22 +287,42 @@ export function useTimeRecords() {
     } else {
       const nextStart = getLatestEndTime(remainingRecords);
       setInitialStart(null);
+
       if (nextStart) {
         await setSessionStart(nextStart);
       }
     }
   }, []);
 
+  const deleteAllUserRecords = useCallback(async () => {
+    const now = Date.now();
+
+    await deleteAllRecords();
+    await setSessionStart(now);
+
+    setRecords([]);
+    setInitialStart(now);
+    setInterruptedNotice(null);
+    setHydrated(true);
+  }, []);
+
   const importRecords = useCallback(async (imported: TimeRecord[]) => {
     const { putAllRecords } = await import("@/lib/db");
+
     const sortedImported = sortRecords(imported);
     await putAllRecords(sortedImported);
     setRecords(sortedImported);
+    setInterruptedNotice(null);
 
     const latestEnd = getLatestEndTime(sortedImported);
+
     if (latestEnd) {
       await setSessionStart(latestEnd);
       setInitialStart(null);
+    } else {
+      const now = Date.now();
+      await setSessionStart(now);
+      setInitialStart(now);
     }
   }, []);
 
@@ -289,6 +335,7 @@ export function useTimeRecords() {
     updateLabel,
     updateCategory,
     deleteLatestRecord,
+    deleteAllUserRecords,
     importRecords,
   };
 }

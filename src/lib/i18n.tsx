@@ -21,6 +21,7 @@ type Translation = {
     track: string;
     review: string;
     trend: string;
+    settings: string;
   };
 
   landing: {
@@ -68,6 +69,24 @@ type Translation = {
     Interrupted: string;
     Uncategorized: string;
   };
+
+  settings: {
+  title: string;
+  subtitle: string;
+  languageTitle: string;
+  languageDescription: string;
+  exportTitle: string;
+  exportDescription: string;
+  exportButton: string;
+  privacyTitle: string;
+  privacyDescription: string;
+  dangerTitle: string;
+  deleteDescription: string;
+  deleteButton: string;
+  deleting: string;
+  deleteSuccess: string;
+  deleteError: string;
+};
 };
 
 const copy: Record<Language, Translation> = {
@@ -80,6 +99,7 @@ const copy: Record<Language, Translation> = {
       track: "记录",
       review: "回顾",
       trend: "趋势",
+      settings: "设置",
     },
 
     landing: {
@@ -128,6 +148,26 @@ const copy: Record<Language, Translation> = {
       Interrupted: "记录中断",
       Uncategorized: "未分类",
     },
+
+    settings: {
+  title: "设置",
+  subtitle: "管理语言、数据和隐私相关选项。",
+  languageTitle: "语言",
+  languageDescription: "切换应用界面的显示语言。",
+  exportTitle: "导出数据",
+  exportDescription: "将你的时间记录导出为 CSV 文件。",
+  exportButton: "导出 CSV",
+  privacyTitle: "隐私",
+  privacyDescription:
+    "你的记录只用于生成你自己的时间线、回顾和趋势。我们不会出售你的数据。",
+  dangerTitle: "危险操作",
+  deleteDescription:
+    "这会永久删除当前账号下的全部 {count} 条时间记录，并重置当前进行中的记录。请输入 DELETE RECORDS 确认。",
+  deleteButton: "删除全部时间记录",
+  deleting: "删除中...",
+  deleteSuccess: "已删除全部时间记录。",
+  deleteError: "删除失败，请稍后再试。",
+},
   },
 
   en: {
@@ -139,6 +179,7 @@ const copy: Record<Language, Translation> = {
       track: "Track",
       review: "Review",
       trend: "Trends",
+      settings: "Settings",
     },
 
     landing: {
@@ -177,6 +218,26 @@ const copy: Record<Language, Translation> = {
       interruptedNotice:
         "Your last session seemed interrupted. A new session has started from now.",
     },
+
+    settings: {
+  title: "Settings",
+  subtitle: "Manage language, data, and privacy options.",
+  languageTitle: "Language",
+  languageDescription: "Switch the display language of the app.",
+  exportTitle: "Export data",
+  exportDescription: "Export your time records as a CSV file.",
+  exportButton: "Export CSV",
+  privacyTitle: "Privacy",
+  privacyDescription:
+    "Your records are used only to power your own timeline, reviews, and trends. We do not sell your data.",
+  dangerTitle: "Danger zone",
+  deleteDescription:
+    "This will permanently delete all {count} time records in this account and reset the current session. Type DELETE RECORDS to confirm.",
+  deleteButton: "Delete all time records",
+  deleting: "Deleting...",
+  deleteSuccess: "All time records have been deleted.",
+  deleteError: "Delete failed. Please try again later.",
+},
 
     categories: {
       Work: "Work",

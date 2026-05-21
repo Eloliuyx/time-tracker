@@ -7,7 +7,7 @@ import { LandingPage } from "@/components/LandingPage";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/lib/supabase";
 
-type ActiveTab = "track" | "review" | "trend";
+type ActiveTab = "track" | "review" | "trend" | "settings";
 
 export default function Home() {
   const { t } = useI18n();
@@ -57,7 +57,7 @@ export default function Home() {
   }
 
   return (
-    <AuthGate>
+    <AuthGate onOpenSettings={() => setActiveTab("settings")}>
       <div className="flex flex-col flex-1 items-center bg-zinc-50 dark:bg-black font-sans">
         <main className="w-full max-w-lg px-4 py-6">
           <div className="mb-6 flex items-center justify-between gap-4">

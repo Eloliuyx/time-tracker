@@ -8,7 +8,13 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 
 type AuthMode = "signIn" | "signUp";
 
-export default function AuthGate({ children }: { children: ReactNode }) {
+export default function AuthGate({
+  children,
+  onOpenSettings,
+}: {
+  children: React.ReactNode;
+  onOpenSettings?: () => void;
+}) {
   const { t, language } = useI18n();
 
   const [loading, setLoading] = useState(true);
@@ -258,20 +264,30 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <>
-      <div className="flex justify-end gap-2 bg-zinc-50 dark:bg-black px-4 pt-4">
-        <LanguageToggle />
-
+return (
+  <div className="min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="flex h-14 items-center justify-end gap-2 px-4">
+      {onOpenSettings && (
         <button
+          type="button"
+          onClick={onOpenSettings}
           className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition"
-          onClick={handleSignOut}
+          aria-label={t.nav.settings}
         >
-          {t.signOut}
+          {t.nav.settings}
         </button>
-      </div>
+      )}
 
-      {children}
-    </>
-  );
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition"
+      >
+        {t.signOut}
+      </button>
+    </div>
+
+    {children}
+  </div>
+);
 }
