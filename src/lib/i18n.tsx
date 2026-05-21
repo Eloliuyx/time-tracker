@@ -111,7 +111,7 @@ const copy: Record<Language, Translation> = {
       subtitle:
         "拒绝死板日程表带来的伪计划与真焦虑。做完就记一下，多简单。",
       authButton: "即刻开始",
-      footer: "百分之百地活在当下。看清你 24 小时每一刻的真实去向。",
+      footer: "百分之百地活在当下。看清每一刻的真实去向。",
     },
 
     auth: {
@@ -193,8 +193,8 @@ landing: {
   title: "Embrace what actually happened.",
   subtitle:
     "Most time tools are just perfectionist wishful thinking. Finished something? Drop a line. It’s that simple.",
-  authButton: "Start Now",
-  footer: "Be 100% present. Own every single minute of your actual life.",
+  authButton: "Get Started",
+  footer: "Stay present. See where your time actually goes.",
 },
 
     auth: {
