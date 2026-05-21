@@ -107,7 +107,7 @@ const copy: Record<Language, Translation> = {
 
     landing: {
       eyebrow: "反向时间追踪",
-      title: "拥抱真实发生的时时刻刻。",
+      title: "拥抱真实发生的点滴时刻。",
       subtitle:
         "拒绝死板日程表带来的伪计划与真焦虑。做完就记一下，多简单。",
       authButton: "即刻开始",
