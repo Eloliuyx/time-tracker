@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TimeTracker } from "@/components/TimeTracker";
 import AuthGate from "@/components/AuthGate";
 import { LandingPage } from "@/components/LandingPage";
 import { useI18n } from "@/lib/i18n";
+import { supabase } from "@/lib/supabase";
 
 type ActiveTab = "track" | "review" | "trend";
 
@@ -12,6 +13,44 @@ export default function Home() {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<ActiveTab>("track");
   const [showAuth, setShowAuth] = useState(false);
+  const [checkedSession, setCheckedSession] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (session) {
+        setShowAuth(true);
+      }
+
+      setCheckedSession(true);
+    }
+
+    checkSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setShowAuth(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  if (!checkedSession) {
+    return null;
+  }
 
   if (!showAuth) {
     return <LandingPage onEnter={() => setShowAuth(true)} />;
